@@ -23,6 +23,9 @@ int getpid(void);
 char* sbrk(int);
 int sleep(int);
 int uptime(void);
+int getyear(void);
+int halt(void);
+struct rtcdate* gettime(struct rtcdate*);
 
 // ulib.c
 int stat(char*, struct stat*);
