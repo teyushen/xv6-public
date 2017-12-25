@@ -6,13 +6,7 @@
 #include "memlayout.h"
 #include "mmu.h"
 #include "proc.h"
-//#include "user.h"
-
-//void
-//printf(int fd, char *s, ...)
-//{
-//    write(fd, s, strlen(s));
-//}
+#include "pstat.h"
 
 int
 sys_fork(void) {
@@ -116,4 +110,10 @@ sys_halt(void) {
     outb(0x70, 0xF);  // offset 0xF is shutdown code
     outb(0x71+1, 0x0A);
     return 0;
+}
+
+void sys_getproc(void) {
+
+    consoleproc();
+    return;
 }

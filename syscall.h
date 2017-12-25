@@ -23,3 +23,4 @@
 #define SYS_getyear  22
 #define SYS_halt   23
 #define SYS_gettime  24
+#define SYS_getproc  25

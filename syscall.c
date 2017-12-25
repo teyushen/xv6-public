@@ -106,6 +106,7 @@ extern int sys_uptime(void);
 extern int sys_getyear(void);
 extern int sys_halt(void);
 extern int sys_gettime(void);
+extern int sys_getproc(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -132,6 +133,7 @@ static int (*syscalls[])(void) = {
 [SYS_getyear] sys_getyear,
 [SYS_halt]    sys_halt,
 [SYS_gettime] sys_gettime,
+[SYS_getproc] sys_getproc,
 };
 
 void

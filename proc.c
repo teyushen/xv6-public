@@ -6,6 +6,8 @@
 #include "x86.h"
 #include "proc.h"
 #include "spinlock.h"
+#include "pstat.h"
+
 
 struct {
   struct spinlock lock;
@@ -13,6 +15,7 @@ struct {
 } ptable;
 
 static struct proc *initproc;
+//struct pstat pstat;
 
 int nextpid = 1;
 extern void forkret(void);
@@ -82,12 +85,14 @@ allocproc(void)
     if(p->state == UNUSED)
       goto found;
 
+
   release(&ptable.lock);
   return 0;
 
 found:
   p->state = EMBRYO;
   p->pid = nextpid++;
+  p->priority = 100-p->pid;
 
   release(&ptable.lock);
 
@@ -112,6 +117,29 @@ found:
   memset(p->context, 0, sizeof *p->context);
   p->context->eip = (uint)forkret;
 
+  // for ps system call
+  /*pstat.pid[p - ptable.proc] = p->pid;
+
+  switch (p->state) {
+    case UNUSED:
+      pstat.state[p - ptable.proc] = "UNUSED";
+          break;
+    case EMBRYO:
+      pstat.state[p - ptable.proc] = "EMBRYO";
+          break;
+    case SLEEPING:
+      pstat.state[p - ptable.proc] = "SLEEPING";
+          break;
+    case RUNNABLE:
+      pstat.state[p - ptable.proc] = "RUNNABLE";
+          break;
+    case RUNNING:
+      pstat.state[p - ptable.proc] = "RUNNING";
+          break;
+    case ZOMBIE:
+      pstat.state[p - ptable.proc] = "ZOMBIE";
+          break;
+  }*/
   return p;
 }
 
@@ -323,22 +351,44 @@ void
 scheduler(void)
 {
   struct proc *p;
+  struct proc *p1;
   struct cpu *c = mycpu();
   c->proc = 0;
-  
+//  static char *states[] = {
+//          [UNUSED]    "unused  ",
+//          [EMBRYO]    "embryo  ",
+//          [SLEEPING]  "sleeping",
+//          [RUNNABLE]  "runable ",
+//          [RUNNING]   "runing  ",
+//          [ZOMBIE]    "zombie  "
+//  };
+
   for(;;){
     // Enable interrupts on this processor.
     sti();
 
     // Loop over process table looking for process to run.
     acquire(&ptable.lock);
+    struct proc *higherproc;
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
       if(p->state != RUNNABLE)
         continue;
 
+      higherproc = p;
+      for(p1 = ptable.proc; p1 < &ptable.proc[NPROC]; p1++) {
+        if (p1->state != RUNNABLE)
+          continue;
+        if(p1->priority < higherproc->priority) {
+          higherproc = p1;
+          cprintf("xxx %s %d\n", higherproc->name, higherproc->pid);
+        }
+      }
+
       // Switch to chosen process.  It is the process's job
       // to release ptable.lock and then reacquire it
       // before jumping back to us.
+      cprintf("start running pid: %d\n", higherproc->pid);
+      p = higherproc;
       c->proc = p;
       switchuvm(p);
       p->state = RUNNING;
@@ -377,7 +427,9 @@ sched(void)
   if(readeflags()&FL_IF)
     panic("sched interruptible");
   intena = mycpu()->intena;
+//  cprintf("sched old:%s pid:%d  --- new:%s pid:%d\n", p->name, p->pid, mycpu()->proc->name, mycpu()->proc->pid);
   swtch(&p->context, mycpu()->scheduler);
+//  p->priority += -1;
   mycpu()->intena = intena;
 }
 
@@ -529,6 +581,40 @@ procdump(void)
       for(i=0; i<10 && pc[i] != 0; i++)
         cprintf(" %p", pc[i]);
     }
+    cprintf("\n");
+  }
+}
+
+void
+consoleproc(void)
+{
+  static char *states[] = {
+          [UNUSED]    "unused  ",
+          [EMBRYO]    "embryo  ",
+          [SLEEPING]  "sleeping",
+          [RUNNABLE]  "runable ",
+          [RUNNING]   "running  ",
+          [ZOMBIE]    "zombie  "
+  };
+//  int i;
+  struct proc *p;
+  char *state;
+//  uint pc[10];
+
+  cprintf("pid\t name\t state\t size\t priority\t \n");
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+    if(p->state == UNUSED)
+      continue;
+    if(p->state >= 0 && p->state < NELEM(states) && states[p->state])
+      state = states[p->state];
+    else
+      state = "???";
+      cprintf("%d\t %s\t %s\t %d KB\t %d\t", p->pid, p->name, state, p->sz/1024, p->priority);
+//    if(p->state == SLEEPING){
+//      getcallerpcs((uint*)p->context->ebp+2, pc);
+//      for(i=0; i<10 && pc[i] != 0; i++)
+//        cprintf(" %p", pc[i]);
+//    }
     cprintf("\n");
   }
 }
