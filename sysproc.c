@@ -91,6 +91,7 @@ sys_getyear(void) {
 
 struct rtcdate* sys_gettime(struct rtcdate *r) {
     cmostime(r);
+    cprintf("%d-%d-%d %d:%d:%d\n", r->year, r->month, r->day, r->hour, r->minute, r->second);
     return r;
 }
 
