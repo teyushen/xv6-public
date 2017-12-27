@@ -113,7 +113,17 @@ sys_halt(void) {
 }
 
 void sys_getproc(void) {
+    struct rtcdate r;
+    cmostime(&r);
 
+    cprintf("==%d-%d-%d %d:%d:%d  pid:%d priority: %d\n", r.year, r.month, r.day, r.hour, r.minute, r.second,
+            myproc()->pid, myproc()->priority);
     consoleproc();
+    for(int i=0; i< 10000;i++){
+     cmostime(&r);
+    }
+    cmostime(&r);
+    cprintf("==%d-%d-%d %d:%d:%d  pid:%d priority: %d\n", r.year, r.month, r.day, r.hour, r.minute, r.second,
+            myproc()->pid, myproc()->priority);
     return;
 }

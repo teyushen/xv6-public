@@ -93,6 +93,15 @@ exec(char *path, char **argv)
       last = s+1;
   safestrcpy(curproc->name, last, sizeof(curproc->name));
 
+  // modify process priority
+  char *name[] = {"ps"};
+  int priority[] = {15};
+  for(int i=0; i< 1; i++) {
+    if(myproc()->name[i]==name[i][0]) {
+      myproc()->priority = priority[i];
+    }
+  }
+
   // Commit to the user image.
   oldpgdir = curproc->pgdir;
   curproc->pgdir = pgdir;

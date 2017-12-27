@@ -7,7 +7,7 @@
 #include "proc.h"
 #include "spinlock.h"
 #include "pstat.h"
-
+#include "date.h"
 
 struct {
   struct spinlock lock;
@@ -41,7 +41,7 @@ struct cpu*
 mycpu(void)
 {
   int apicid, i;
-  
+
   if(readeflags()&FL_IF)
     panic("mycpu called with interrupts enabled\n");
   
@@ -51,7 +51,9 @@ mycpu(void)
   for (i = 0; i < ncpu; ++i) {
     if (cpus[i].apicid == apicid)
       return &cpus[i];
+
   }
+
   panic("unknown apicid\n");
 }
 
@@ -86,13 +88,14 @@ allocproc(void)
       goto found;
 
 
+
   release(&ptable.lock);
   return 0;
 
 found:
   p->state = EMBRYO;
   p->pid = nextpid++;
-  p->priority = 100-p->pid;
+  p->priority = 5;
 
   release(&ptable.lock);
 
@@ -152,7 +155,7 @@ userinit(void)
   extern char _binary_initcode_start[], _binary_initcode_size[];
 
   p = allocproc();
-  
+
   initproc = p;
   if((p->pgdir = setupkvm()) == 0)
     panic("userinit: out of memory?");
@@ -359,7 +362,7 @@ scheduler(void)
 //          [EMBRYO]    "embryo  ",
 //          [SLEEPING]  "sleeping",
 //          [RUNNABLE]  "runable ",
-//          [RUNNING]   "runing  ",
+//          [RUNNING]   "running  ",
 //          [ZOMBIE]    "zombie  "
 //  };
 
@@ -378,24 +381,27 @@ scheduler(void)
       for(p1 = ptable.proc; p1 < &ptable.proc[NPROC]; p1++) {
         if (p1->state != RUNNABLE)
           continue;
+
         if(p1->priority < higherproc->priority) {
+//          cprintf("change proc from: pid=%d name=%s priority=%d to => pid=%d name=%s priority=%d\n", higherproc->pid,
+//                  higherproc->name, higherproc->priority, p1->pid, p1->name, p1->priority);
           higherproc = p1;
-          cprintf("xxx %s %d\n", higherproc->name, higherproc->pid);
         }
       }
 
       // Switch to chosen process.  It is the process's job
       // to release ptable.lock and then reacquire it
       // before jumping back to us.
-      cprintf("start running pid: %d\n", higherproc->pid);
       p = higherproc;
       c->proc = p;
       switchuvm(p);
       p->state = RUNNING;
+//      cprintf("cpuid %d start running pid: %d %d\n", cpuid(), higherproc->pid, higherproc->priority);
 
       swtch(&(c->scheduler), p->context);
       switchkvm();
 
+//      cprintf("end\n");
       // Process is done running for now.
       // It should have changed its p->state before coming back.
       c->proc = 0;
@@ -601,7 +607,7 @@ consoleproc(void)
   char *state;
 //  uint pc[10];
 
-  cprintf("pid\t name\t state\t size\t priority\t \n");
+  cprintf("pid\t name\t state\t\t size\t priority\t \n");
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
     if(p->state == UNUSED)
       continue;
