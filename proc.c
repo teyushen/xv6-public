@@ -396,6 +396,9 @@ scheduler(void)
       c->proc = p;
       switchuvm(p);
       p->state = RUNNING;
+      if(p->priority < 100) {
+        p->priority += 1;
+      }
 //      cprintf("cpuid %d start running pid: %d %d\n", cpuid(), higherproc->pid, higherproc->priority);
 
       swtch(&(c->scheduler), p->context);
