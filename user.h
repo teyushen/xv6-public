@@ -28,6 +28,8 @@ int getyear(void);
 int halt(void);
 struct rtcdate* gettime(struct rtcdate*);
 void getproc(void);
+void prio1(void);
+void prio2(void);
 
 // ulib.c
 int stat(char*, struct stat*);

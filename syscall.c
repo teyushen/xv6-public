@@ -107,6 +107,9 @@ extern int sys_getyear(void);
 extern int sys_halt(void);
 extern int sys_gettime(void);
 extern int sys_getproc(void);
+extern int sys_prio1(void);
+extern int sys_prio2(void);
+
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -134,6 +137,8 @@ static int (*syscalls[])(void) = {
 [SYS_halt]    sys_halt,
 [SYS_gettime] sys_gettime,
 [SYS_getproc] sys_getproc,
+[SYS_prio1]   sys_prio1,
+[SYS_prio2]   sys_prio2
 };
 
 void

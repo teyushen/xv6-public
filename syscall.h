@@ -24,3 +24,7 @@
 #define SYS_halt   23
 #define SYS_gettime  24
 #define SYS_getproc  25
+#define SYS_prio1  26
+#define SYS_prio2  27
+
+

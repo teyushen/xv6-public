@@ -128,3 +128,37 @@ void sys_getproc(void) {
             myproc()->pid, myproc()->priority);
     return;
 }
+
+void sys_prio1(void) {
+
+    struct rtcdate r;
+    cmostime(&r);
+
+    cprintf("======Process %s Start %d-%d-%d %d:%d:%d priority: %d\n", myproc()->name , r.year, r.month, r.day, r.hour,
+            r.minute, r.second, myproc()->priority);
+
+    consoleproc();
+
+    cprintf("======Process %s End %d-%d-%d %d:%d:%d priority: %d\n", myproc()->name , r.year, r.month, r.day, r.hour,
+            r.minute, r.second, myproc()->priority);
+    return;
+}
+
+void sys_prio2(void) {
+
+    struct rtcdate r;
+    cmostime(&r);
+
+    cprintf("======Process %s Start %d-%d-%d %d:%d:%d priority: %d\n", myproc()->name , r.year, r.month, r.day, r.hour,
+            r.minute, r.second, myproc()->priority);
+    for(int i=0; i< 80000;i++){
+        cmostime(&r);
+    }
+    consoleproc();
+    cprintf("======Process %s End %d-%d-%d %d:%d:%d priority: %d\n", myproc()->name , r.year, r.month, r.day, r.hour,
+            r.minute, r.second, myproc()->priority);
+    return;
+}
+
+
+
