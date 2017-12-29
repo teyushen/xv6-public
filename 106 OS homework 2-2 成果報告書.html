@@ -1,0 +1,46 @@
+<div id="doc" class="markdown-body container-fluid" style="position: relative;"><h1 id="106-os-homework-2-2-成果報告書">106 OS homework 2-2 成果報告書</h1><blockquote>
+<p>組長：隨班附讀、廖哲賢<br>
+組員：隨班附讀、沈德祐<br>
+github: <a href="https://github.com/teyushen/xv6-public" target="_blank">https://github.com/teyushen/xv6-public</a></p>
+</blockquote><hr><h1 id="🙂-使用情境說明包含流程圖">🙂 使用情境說明(包含流程圖)</h1><ol>
+<li>實作了ps 功能列出所有process的狀態。</li>
+<li>實作了優先權高的process先執行功能，USER 端可以同時執行兩個process，並可以看到每個process的相關狀態，以及目前在執行什麼process，有刻意將一個process做sleep動作來檢視優先權。</li>
+</ol><hr><h1 id="😇-成功畫面">😇 成功畫面</h1><ol>
+<li>ps功能(列出所有process狀態)<br>
+<img src="https://i.imgur.com/PCGZTF8.png" alt=""></li>
+<li>新增兩個 測試用process prio1及sleepprio，同時執行後會先執行優先權限較高（數字越小越高）圖片中可以看到哪個process name 跟優先權開始執行的時間以及結束的時間，其中sleepprio 有做類似sleep的刻意處理。<br>
+<img src="https://i.imgur.com/VveZt1N.png" alt=""></li>
+</ol><hr><h1 id="🏃-實作過程修改哪些檔案含圖片">🏃 實作過程(修改哪些檔案[含圖片])</h1><ol>
+<li>kernel 層</li>
+</ol><ul>
+<li>
+<p><strong>修改 <code>lapic.c</code> 的 <code>cmostime</code></strong> =&gt; 將 UTC 時間轉成 TW 時間。<br>
+<img src="https://github.com/teyushen/xv6-public/blob/develop/cmostime.png?raw=true" alt=""></p>
+</li>
+<li>
+<p><strong>修改 <code>proc.c</code> 的 <code>allocproc</code>, <code>scheduler</code> 以及 <code>proc.h</code> 的 <code>proc</code> 資料結構(多增加優先權)</strong><br>
+=&gt; 修改排程為 <code>Round Robin</code> 與 <code>Priority 的結合</code>。每次選定要執行的 process 都判斷其優先權，每次排成過的 process 都會降低其 priority。<br>
+<img src="https://github.com/teyushen/xv6-public/blob/develop/allocproc.png?raw=true" alt=""><br>
+<img src="https://github.com/teyushen/xv6-public/blob/develop/scheduler.png?raw=true" alt=""><br>
+<img src="https://github.com/teyushen/xv6-public/blob/develop/proc.h.png?raw=true" alt=""></p>
+</li>
+<li>
+<p><strong>新增 <code>proc.c</code> 的 <code>consoleproc</code></strong> =&gt; 列出 <code>pid</code>, <code>name</code>, <code>state</code>, <code>priority</code><br>
+<img src="https://github.com/teyushen/xv6-public/blob/develop/consoleproc.png?raw=true" alt=""></p>
+</li>
+</ul><ol start="2">
+<li>systemcall</li>
+</ol><ul>
+<li>新增測試權限用的兩個systemcall <code>sys_prio1</code> 及<code>sys_sleepprio</code> 其中 <code>sleepprio</code> 有做sleep處理。</li>
+<li><strong>修改 <code>exec.c</code> 的 <code>exec</code></strong> =&gt; 定義 systemcall 的 priority</li>
+</ul><ol start="3">
+<li>user</li>
+</ol><ul>
+<li>新增兩個process <code>prio1</code> 及 <code>sleepprio</code> 指令讓user可以測試先權的執行狀態。</li>
+<li>查詢當前時間功能 =&gt; 新增 <code>date.c</code></li>
+<li>查詢當前 process（pid, state, priority…)指令 =&gt; <code>ps.c</code></li>
+</ul><hr><h1 id="😎-結論">😎 結論</h1><p>不同 systemcall 可以給定不同的 priority，priority 的會優先執行。但為了避免 starving 的問題。每次執行過的 systemcall 的 priority 會下降，因此可以避免 starving 的情況。</p><p><strong>此為 <code>Round Robin</code> 與 <code>Priority</code> 結合的 schedule 實作。</strong></p><hr><h1 id="📅-組員分工">📅 組員分工</h1><ol>
+<li>沈德祐 負責實作ps功能及新增優先權排程功能（kernel層及systemcall）</li>
+<li>廖哲賢 負責實作測試process 及 demo相關程式碼 （user層及systemcall）</li>
+<li>其餘部分為共同完成</li>
+</ol><hr></div>
