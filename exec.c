@@ -94,8 +94,8 @@ exec(char *path, char **argv)
   safestrcpy(curproc->name, last, sizeof(curproc->name));
 
   // modify process priority
-  char *name[] = {"ps", "ls" };
-  int priority[] = {15, 10};
+  char *name[] = {"ps", "ls" ,"prio1" , "sleepprio"};
+  int priority[] = {15, 10 , 20 , 25};
   for(int i=0; i < sizeof(priority)/ sizeof(priority[0]); i++) {
     if(myproc()->name[0]==name[i][0]) {
       myproc()->priority = priority[i];

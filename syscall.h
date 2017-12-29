@@ -25,6 +25,6 @@
 #define SYS_gettime  24
 #define SYS_getproc  25
 #define SYS_prio1  26
-#define SYS_prio2  27
+#define SYS_sleepprio  27
 
 

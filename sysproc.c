@@ -144,7 +144,7 @@ void sys_prio1(void) {
     return;
 }
 
-void sys_prio2(void) {
+void sys_sleepprio(void) {
 
     struct rtcdate r;
     cmostime(&r);

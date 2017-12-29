@@ -3,7 +3,7 @@
 
 int
 main(void) {
-    prio2();
+    sleepprio();
 
     exit();
 }
